@@ -2,12 +2,11 @@ package pl.bnowakowski.home_assistant_workaround
 
 import mu.KotlinLogging
 import org.openqa.selenium.*
-import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
 import org.openqa.selenium.firefox.FirefoxProfile
-import org.openqa.selenium.safari.SafariDriver
-import kotlin.NoSuchElementException
+
 
 class HomeAssistant {
 
@@ -15,10 +14,15 @@ class HomeAssistant {
     private val js: JavascriptExecutor
     private val homeAssistantProperties = HomeAssistantProperties()
 
+    private val logger = KotlinLogging.logger {}
+
 
     init {
 //         Chrome
-//        driver = ChromeDriver()
+          // https://www.browserstack.com/guide/selenium-headless-browser-testing
+//        val options = ChromeOptions()
+//        options.addArguments("--headless")
+//        //        driver = ChromeDriver(options)
 
         // Safari
 //        driver = SafariDriver()
@@ -32,6 +36,8 @@ class HomeAssistant {
         val firefoxOptions = FirefoxOptions()
         firefoxOptions.addArguments("--width=1000")
         firefoxOptions.addArguments("--height=3440")
+        // https://github.com/mdn/headless-examples/blob/master/headlessfirefox-gradle/src/main/java/com/mozilla/example/HeadlessFirefoxSeleniumExample.java
+        firefoxOptions.addArguments("--headless")
         firefoxOptions.profile = firefoxProfile
 
         driver = FirefoxDriver(firefoxOptions)
@@ -48,7 +54,9 @@ class HomeAssistant {
 
     fun login() {
 
-        driver[homeAssistantProperties.getProperty("home-assistant.url")+"/lovelace"]
+        val loggingUrl = homeAssistantProperties.getProperty("home-assistant.url")+"/lovelace"
+        logger.debug("openning url=$loggingUrl")
+        driver[loggingUrl]
         // for some reason home assistant refreshes itself, so we wait to counter that
         Thread.sleep(10000)
         driver.findElement(By.name("username")).sendKeys(homeAssistantProperties.getProperty("home-assistant.username"))
@@ -65,6 +73,7 @@ class HomeAssistant {
         Thread.sleep(100)
         driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
         Thread.sleep(100)
+        logger.debug("trying to press sign in button")
         driver.findElement(By.cssSelector("body")).sendKeys(Keys.RETURN)
         Thread.sleep(2000)
     }
@@ -93,11 +102,13 @@ class HomeAssistant {
 //        driver[homeAssistantProperties.getProperty("home-assistant.url")+"/dashboard-scheduler"]
 //        Thread.sleep(2000)
         //        println(countOccurrences(driver.pageSource, "hours"))
+        // TODO check if when scheduler-card will display toogle for all schedules is it enough to toggle that one instead going one by one
 
         for (i in 1..4) {
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
             Thread.sleep(100)
         }
+        logger.debug("trying to open Schedules dashboard")
         driver.findElement(By.cssSelector("body")).sendKeys(Keys.RETURN)
         Thread.sleep(2000)
         for (i in 1..13) {
@@ -106,21 +117,25 @@ class HomeAssistant {
         }
 
         val numberOfSchedules: Int = homeAssistantProperties.getProperty("home-assistant.number-of-schedules").toInt()
-
+        logger.debug("got numberOfSchedules=$numberOfSchedules")
 
         for (i in 1..numberOfSchedules) {
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
             Thread.sleep(100)
+            logger.debug("trying to turn off i=$i schedule")
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
             Thread.sleep(5000)
+            logger.debug("trying to turn on i=$i schedule")
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
             Thread.sleep(100)
         }
+        logger.debug("finished all schedules")
 
         Thread.sleep(500)
     }
 
     fun finish() {
+        logger.debug("closing firefox")
         driver.close()
     }
 
