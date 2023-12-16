@@ -1,15 +1,16 @@
 package pl.bnowakowski.home_assistant_workaround
 
-import mu.KotlinLogging
+import kotlin.system.exitProcess
 
 
 fun main() {
-    val logger = KotlinLogging.logger {}
 
     val homeAssistant = HomeAssistant()
 
     homeAssistant.login()
     homeAssistant.iterateThroughSchedulesAndSaveOnEach()
     homeAssistant.finish()
+
+    exitProcess(0)
 }
 
