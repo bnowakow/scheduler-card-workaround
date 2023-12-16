@@ -9,17 +9,16 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
     implementation("ch.qos.logback:logback-classic:1.4.5")
-//    implementation("org.seleniumhq.selenium:selenium-chrome-driver:4.7.2")
-    implementation("org.seleniumhq.selenium:selenium-firefox-driver:4.7.2")
-//    implementation("org.seleniumhq.selenium:selenium-safari-driver:4.7.2")
-    implementation("org.seleniumhq.selenium:selenium-java:4.7.2")
-    implementation("org.seleniumhq.selenium:selenium-support:4.7.2")
+    implementation("org.seleniumhq.selenium:selenium-chrome-driver:4.16.1")
+    implementation("org.seleniumhq.selenium:selenium-firefox-driver:4.16.1")
+    implementation("org.seleniumhq.selenium:selenium-safari-driver:4.16.1")
+    implementation("org.seleniumhq.selenium:selenium-java:4.16.1")
+    implementation("org.seleniumhq.selenium:selenium-support:4.16.1")
     testImplementation(kotlin("test"))
 }
 

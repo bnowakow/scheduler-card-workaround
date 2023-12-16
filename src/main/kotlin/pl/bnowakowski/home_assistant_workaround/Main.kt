@@ -6,8 +6,10 @@ import mu.KotlinLogging
 fun main() {
     val logger = KotlinLogging.logger {}
 
-    val homeAssistant: HomeAssistant = HomeAssistant()
+    val homeAssistant = HomeAssistant()
 
     homeAssistant.login()
+    homeAssistant.iterateThroughSchedulesAndSaveOnEach()
+    homeAssistant.finish()
 }
 
