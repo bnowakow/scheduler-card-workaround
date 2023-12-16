@@ -1,3 +1,5 @@
+package pl.bnowakowski.home_assistant_workaround
+
 import java.util.*
 
 // https://medium.com/@platky/very-simple-property-reading-in-kotlin-3265cb4382bf
@@ -12,5 +14,5 @@ abstract class PropertiesReader(fileName: String) {
     fun getProperty(key: String): String = properties.getProperty(key)
 }
 
-//class Facebook4jProperties : PropertiesReader("facebook4j.properties")
+class HomeAssistantProperties : PropertiesReader("home-assistant.properties")
 

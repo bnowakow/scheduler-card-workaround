@@ -6,6 +6,7 @@ import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
 import org.openqa.selenium.firefox.FirefoxProfile
 import kotlin.NoSuchElementException
+
 class HomeAssistant {
 
     private var driver: WebDriver
@@ -25,9 +26,13 @@ class HomeAssistant {
         firefoxOptions.profile = firefoxProfile
 
         driver = FirefoxDriver(firefoxOptions)
-        driver.manage().window().position = Point(800, 0)
+        // laptop screen
+//        driver.manage().window().position = Point(800, 0)
+        // desktop screen
+        driver.manage().window().position = Point(1490, 0)
 
-        driver["https://home-assistant.localdomain.bnowakowski.pl:8123/"]
+
+        driver
         js = driver as JavascriptExecutor
 //        driver.findElement(By.cssSelector("body")).sendKeys(Keys.chord(Keys.COMMAND, "-"))
 
@@ -40,9 +45,22 @@ class HomeAssistant {
 
     public fun login() {
 
-//        val facebookProperties = FacebookProperties()
+        val homeAssistantProperties = HomeAssistantProperties()
 
         driver["https://home-assistant.localdomain.bnowakowski.pl:8123/"]
+        // for some reason home assistant refreshes itself, so we wait to counter that
+        Thread.sleep(10000)
+        driver.findElement(By.name("username")).sendKeys(homeAssistantProperties.getProperty("home-assistant.username"))
+        driver.findElement(By.name("password")).sendKeys(homeAssistantProperties.getProperty("home-assistant.password"))
+        Thread.sleep(500)
+//        driver.findElement(By.id("button")).click()
+        // workaround for above
+        for (i in 1..3) {
+            driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
+            Thread.sleep(100)
+        }
+        driver.findElement(By.cssSelector("body")).sendKeys(Keys.RETURN)
+        Thread.sleep(6000)
     }
 
 }
