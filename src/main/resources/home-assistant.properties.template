@@ -2,4 +2,7 @@ home-assistant.url=
 home-assistant.username=
 home-assistant.password=
 home-assistant.number-of-schedules=1
+
+zigbee2mqtt.url=
+
 browser.headless=true
