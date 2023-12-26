@@ -14,7 +14,7 @@ fun main() {
     homeAssistant.iterateThroughSchedulesAndToggleThem()
 
     //2
-    homeAssistant.iterateThroughSwitchesInAlwaysOnGroupAndToggleThem()
+//    homeAssistant.iterateThroughSwitchesInAlwaysOnGroupAndToggleThem()
 
     // run always
     homeAssistant.finish()
