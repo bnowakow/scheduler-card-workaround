@@ -8,7 +8,8 @@ fun main() {
     val homeAssistant = HomeAssistant()
 
     homeAssistant.login()
-    homeAssistant.iterateThroughSchedulesAndSaveOnEach()
+    homeAssistant.iterateThroughSchedulesAndToggleThem()
+    homeAssistant.iterateThroughSwitchesInAlwaysOnGroupAndToggleThem()
     homeAssistant.finish()
 
     exitProcess(0)
