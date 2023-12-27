@@ -161,13 +161,7 @@ class HomeAssistant {
         Thread.sleep(500)
     }
 
-    fun iterateThroughSwitchesInAlwaysOnGroupAndToggleThem() {
-        val zigbe2mqttUrl = homeAssistantProperties.getProperty("zigbee2mqtt.url")+"/#/group/4"
-        logger.debug("openning url=$zigbe2mqttUrl")
-        driver[zigbe2mqttUrl]
-
-        Thread.sleep(2000)
-
+    fun tabUntilAttributeEquals(attributeName :String, expectedValue: String) {
         var i = 0
         while (true) {
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
@@ -175,25 +169,37 @@ class HomeAssistant {
             val elementText = driver.switchTo().activeElement().text
             logger.debug("tab i=$i element_txt=$elementText")
             try {
-                if (driver.switchTo().activeElement().getAttribute("class").equals("btn btn-danger btn-sm float-right")) {
+                if (driver.switchTo().activeElement().getAttribute(attributeName).equals(expectedValue)) {
                     break
                 }
             } catch( e: NullPointerException) {
             }
             i++
         }
+    }
+
+    fun iterateThroughSwitchesInAlwaysOnGroupAndToggleThem() {
+        val zigbe2mqttUrl = homeAssistantProperties.getProperty("zigbee2mqtt.url")+"/#/group/4"
+        logger.debug("openning url=$zigbe2mqttUrl")
+        driver[zigbe2mqttUrl]
+
+        Thread.sleep(2000)
+
+        tabUntilAttributeEquals("class", "btn btn-danger btn-sm float-right")
 
         val numberOfSwitches: Int = countOccurrences(driver.pageSource, "LQI")
         logger.debug("got numberOfSwitches=$numberOfSwitches")
 
         for (i in 1..numberOfSwitches) {
-            driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
-            Thread.sleep(100)
-            val elementClass = driver.switchTo().activeElement().getAttribute("class")
-            logger.debug("tab i=$i elementClass=$elementClass")
 
-//             TODO read enpoint number and toggle only appriopriate switch
+
+            // TODO read enpoint number and toggle only appriopriate switch
             for (j in 1 .. 2) {
+                tabUntilAttributeEquals("class", "form-check-input")
+
+                val elementClass = driver.switchTo().activeElement().getAttribute("class")
+                logger.debug("tab i=$i elementClass=$elementClass")
+
                 var isSwitchEnabled:Boolean = false
                 isSwitchEnabled = try {
                     driver.switchTo().activeElement().getAttribute("checked").equals("true")
@@ -213,8 +219,6 @@ class HomeAssistant {
                     driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
                     Thread.sleep(100)
                 }
-                driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
-                Thread.sleep(100)
             }
         }
         logger.debug("finished all switches")
