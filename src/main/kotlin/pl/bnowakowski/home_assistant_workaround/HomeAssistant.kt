@@ -168,11 +168,19 @@ class HomeAssistant {
 
         Thread.sleep(2000)
 
-        for (i in 1..14) {
+        var i = 0
+        while (true) {
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
             Thread.sleep(100)
             val elementText = driver.switchTo().activeElement().text
             logger.debug("tab i=$i element_txt=$elementText")
+            try {
+                if (driver.switchTo().activeElement().getAttribute("class").equals("btn btn-danger btn-sm float-right")) {
+                    break
+                }
+            } catch( e: NullPointerException) {
+            }
+            i++
         }
 
         val numberOfSwitches: Int = countOccurrences(driver.pageSource, "LQI")
@@ -181,8 +189,8 @@ class HomeAssistant {
         for (i in 1..numberOfSwitches) {
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
             Thread.sleep(100)
-            val elementText = driver.switchTo().activeElement().text
-            logger.debug("tab i=$i element_txt=$elementText")
+            val elementClass = driver.switchTo().activeElement().getAttribute("class")
+            logger.debug("tab i=$i elementClass=$elementClass")
 
 //             TODO read enpoint number and toggle only appriopriate switch
             for (j in 1 .. 2) {
