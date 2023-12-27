@@ -217,7 +217,7 @@ class HomeAssistant {
 
                 for (k in 1..numberOfToggles) {
                     driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
-                    Thread.sleep(100)
+                    Thread.sleep(1000)
                 }
             }
         }
