@@ -129,7 +129,7 @@ class HomeAssistant {
         logger.debug("trying to open Schedules dashboard")
         driver.findElement(By.cssSelector("body")).sendKeys(Keys.RETURN)
         Thread.sleep(2000)
-        for (i in 1..13) {
+        for (i in 1..14) {
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
             Thread.sleep(100)
             val elementText = driver.switchTo().activeElement().text
