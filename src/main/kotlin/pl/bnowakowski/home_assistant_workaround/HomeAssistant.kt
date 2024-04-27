@@ -118,7 +118,7 @@ class HomeAssistant {
 //        Thread.sleep(10000)
 
 
-        for (i in 1..4) {
+        for (i in 1..5) {
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
             Thread.sleep(100)
             val elementText = driver.switchTo().activeElement().text
@@ -129,7 +129,7 @@ class HomeAssistant {
         logger.debug("trying to open Schedules dashboard")
         driver.findElement(By.cssSelector("body")).sendKeys(Keys.RETURN)
         Thread.sleep(2000)
-        for (i in 1..14) {
+        for (i in 1..12) {
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
             Thread.sleep(100)
             val elementText = driver.switchTo().activeElement().text
