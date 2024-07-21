@@ -12,7 +12,7 @@ git pull
 docker buildx build --platform linux/amd64 --tag bnowakow/scheduler-card-thermostat-workaround:latest .
 
 while true; do
-    timeout 600 docker compose up
+    timeout 1200 docker compose up
     docker compose down
     date
     sleep 30m
