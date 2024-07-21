@@ -215,6 +215,8 @@ class HomeAssistant {
 
         if (homeAssistantProperties.getProperty("zigbee2mqtt.iterate-through-switches-in-always-on-group-and-toggle-them-enabled") == "true") {
 
+            logger.info("Toggling switches on")
+
             val zigbe2mqttUrl = homeAssistantProperties.getProperty("zigbee2mqtt.url") + "/#/group/4"
             logger.info("openning url=$zigbe2mqttUrl")
             driver[zigbe2mqttUrl]
@@ -229,7 +231,7 @@ class HomeAssistant {
 
             for (i in 1..numberOfSwitches) {
 
-
+                logger.info("\tswitch i=$i")
                 // TODO read enpoint number and toggle only appriopriate switch
                 for (j in 1..2) {
                     tabUntilAttributeEquals("class", "form-check-input")
@@ -255,7 +257,7 @@ class HomeAssistant {
                     } else {
                         3
                     }
-                    logger.debug("switch i=$i j=$j isEnabled=$isSwitchEnabled numberOfToggles=$numberOfToggles")
+                    logger.info("\t\tendpoint j=$j isEnabled=$isSwitchEnabled numberOfToggles=$numberOfToggles")
 
                     for (k in 1..numberOfToggles) {
                         driver.switchTo().activeElement().sendKeys(Keys.SPACE)
@@ -283,6 +285,8 @@ class HomeAssistant {
 
     private fun iterateThroughSwitchesInAlwaysOnGroupAndSetDecoupleMode() {
 
+        logger.info("Seting operation mode to decoupled")
+
         for (switchDeviceAboutUrl in switchDeviceUrls) {
             val switchDeviceExposesUrl: String = "$switchDeviceAboutUrl/exposes"
             logger.info("openning url=$switchDeviceExposesUrl")
@@ -305,7 +309,7 @@ class HomeAssistant {
                 }
                 if (previousSibling.getAttribute("title").contains("Decoupled mode for")) {
                     // click refresh
-                    logger.info("clicking refresh button for operation mode")
+                    logger.debug("\tclicking refresh button for operation mode")
                     driver.switchTo().activeElement().sendKeys(Keys.SPACE)
                     Thread.sleep(4000)
                     // decouple operation mode is second after control_relay
@@ -314,21 +318,23 @@ class HomeAssistant {
                     }
 
                     if (driver.switchTo().activeElement().text.equals("decoupled")) {
-                        logger.info("clicking decoupled")
+                        if (driver.switchTo().activeElement().getAttribute("class").contains("active")) {
+                            logger.info("\tendpoint i=$i marked already as decoupled")
+                        } else {
+                            logger.info("\tendpoint i=$i marked as control_relay")
+                        }
+                        logger.debug("\tclicking decoupled")
                         // TODO for some reason in Arc html returns coupled mode for same device that in this Firefox returns decoupled :/
-//                        driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
                         driver.switchTo().activeElement().sendKeys(Keys.SPACE)
                     } else {
-                        logger.error("active element wasn't decoupled operation mode")
+                        logger.error("\tactive element wasn't decoupled operation mode")
                     }
                 } else {
-                    logger.error("active element wasn't refresh button for operation mode")
+                    logger.error("\tactive element wasn't refresh button for operation mode")
                 }
 
                 Thread.sleep(2000)
             }
-
-            println("debug")
         }
     }
 
