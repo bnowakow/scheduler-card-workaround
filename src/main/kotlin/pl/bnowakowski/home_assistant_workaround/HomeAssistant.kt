@@ -4,11 +4,7 @@ import mu.KotlinLogging
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
-import org.openqa.selenium.firefox.FirefoxDriver
-import org.openqa.selenium.firefox.FirefoxOptions
-import org.openqa.selenium.firefox.FirefoxProfile
 import org.openqa.selenium.remote.RemoteWebElement
-import kotlin.math.log
 
 
 class HomeAssistant {
@@ -28,7 +24,10 @@ class HomeAssistant {
         val options = ChromeOptions()
         if (homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
             logger.debug("running browser in headless mode")
-            options.addArguments("--headless")
+            options.addArguments("--no-sandbox")
+            options.addArguments("--headless=new")
+            options.addArguments("--disable-gpu")
+            options.addArguments("--disable-dev-shm-usage")
         }
         driver = ChromeDriver(options)
 
