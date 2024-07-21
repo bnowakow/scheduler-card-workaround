@@ -24,37 +24,38 @@ class HomeAssistant {
 
     init {
 //         Chrome
-          // https://www.browserstack.com/guide/selenium-headless-browser-testing
-        val options = ChromeOptions()
-        if (homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
-            logger.debug("running browser in headless mode")
-            options.addArguments("--headless")
-        }
-        driver = ChromeDriver(options)
+//          // https://www.browserstack.com/guide/selenium-headless-browser-testing
+//        val options = ChromeOptions()
+//        if (homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
+//            logger.debug("running browser in headless mode")
+//            options.addArguments("--headless")
+//        }
+//        driver = ChromeDriver(options)
 
         // Safari
 //        driver = SafariDriver()
 
-//        // Firefox
-//        // https://www.browserstack.com/docs/automate/selenium/firefox-profile
-//        val firefoxProfile = FirefoxProfile()
-//
-//        // https://stackoverflow.com/questions/15397483/how-do-i-set-browser-width-and-height-in-selenium-webdriver
-//        val firefoxOptions = FirefoxOptions()
-//
-//        // https://github.com/mdn/headless-examples/blob/master/headlessfirefox-gradle/src/main/java/com/mozilla/example/HeadlessFirefoxSeleniumExample.java
-//        if (homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
-//            logger.debug("running browser in headless mode")
-//            firefoxOptions.addArguments("--headless")
-//        } else {
-//            logger.debug("running browser in non-headless mode")
-//            // https://stackoverflow.com/questions/15397483/how-do-i-set-browser-width-and-height-in-selenium-webdriver
-//            firefoxOptions.addArguments("--width=1000")
-//            firefoxOptions.addArguments("--height=3440")
-//        }
-//        firefoxOptions.profile = firefoxProfile
-//
-//        driver = FirefoxDriver(firefoxOptions)
+        // Firefox
+        // https://www.browserstack.com/docs/automate/selenium/firefox-profile
+        val firefoxProfile = FirefoxProfile()
+
+        // https://stackoverflow.com/questions/15397483/how-do-i-set-browser-width-and-height-in-selenium-webdriver
+        val firefoxOptions = FirefoxOptions()
+
+        // https://github.com/mdn/headless-examples/blob/master/headlessfirefox-gradle/src/main/java/com/mozilla/example/HeadlessFirefoxSeleniumExample.java
+        if (homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
+            logger.debug("running browser in headless mode")
+            firefoxOptions.addArguments("--headless")
+        } else {
+            logger.debug("running browser in non-headless mode")
+            // https://stackoverflow.com/questions/15397483/how-do-i-set-browser-width-and-height-in-selenium-webdriver
+            firefoxOptions.addArguments("--width=1000")
+            firefoxOptions.addArguments("--height=3440")
+        }
+        firefoxOptions.profile = firefoxProfile
+
+        driver = FirefoxDriver(firefoxOptions)
+
         if (!homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
             // laptop screen
 //        driver.manage().window().position = Point(800, 0)
@@ -85,12 +86,13 @@ class HomeAssistant {
             Thread.sleep(100)
         }
         // selecting keep me logged in since without it reload of this tab will log us out
-        driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
+        driver.switchTo().activeElement().sendKeys(Keys.SPACE)
         Thread.sleep(100)
+        driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
         driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
         Thread.sleep(100)
         logger.debug("trying to press sign in button")
-        driver.findElement(By.cssSelector("body")).sendKeys(Keys.RETURN)
+        driver.switchTo().activeElement().sendKeys(Keys.RETURN)
         Thread.sleep(2000)
     }
 
@@ -139,7 +141,7 @@ class HomeAssistant {
             }
             logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
             logger.debug("trying to open Schedules dashboard")
-            driver.findElement(By.cssSelector("body")).sendKeys(Keys.RETURN)
+            driver.switchTo().activeElement().sendKeys(Keys.RETURN)
             Thread.sleep(2000)
             for (i in 1..12) {
                 driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
@@ -165,13 +167,13 @@ class HomeAssistant {
                 logger.debug("tab i=$i element_txt=$elementText")
                 logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
                 logger.debug("trying to turn off i=$i schedule")
-                driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
+                driver.switchTo().activeElement().sendKeys(Keys.SPACE)
                 Thread.sleep(5000)
                 val elementText2 = driver.switchTo().activeElement().text
                 logger.debug("tab i=$i element_txt=$elementText2")
                 logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
                 logger.debug("trying to turn on i=$i schedule")
-                driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
+                driver.switchTo().activeElement().sendKeys(Keys.SPACE)
                 Thread.sleep(100)
             }
             logger.debug("finished all schedules")
@@ -328,8 +330,6 @@ class HomeAssistant {
 
                 Thread.sleep(2000)
             }
-
-            println("debug")
         }
     }
 
