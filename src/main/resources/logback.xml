@@ -1,0 +1,14 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="pl.bnowakowski.home_assistant_workaround.logging.LoggingLayout" />
+        </encoder>
+    </appender>
+
+    <!-- TODO netty logging set to info -->
+    <logger name="HomeAssistant" level="info" />
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
