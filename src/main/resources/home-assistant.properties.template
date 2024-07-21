@@ -1,8 +1,11 @@
 home-assistant.url=
 home-assistant.username=
 home-assistant.password=
+home-assistant.toggle-schedules-enabled=true
 home-assistant.number-of-schedules=1
 
+zigbee2mqtt.iterate-through-switches-in-always-on-group-and-toggle-them-enabled=true
+zigbee2mqtt.force-toggle-when-switch-is-already-on=false
 zigbee2mqtt.url=
 
 browser.headless=true

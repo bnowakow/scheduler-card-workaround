@@ -106,11 +106,15 @@ class HomeAssistant {
 
     fun iterateThroughSchedulesAndToggleThem() {
 
-        // there's a problem with pagesource so instead going with unreliable tabs for this time
+        if (homeAssistantProperties.getProperty("home-assistant.toggle-schedules-enabled") == "true") {
+
+            login()
+
+            // there's a problem with pagesource so instead going with unreliable tabs for this time
 //        driver[homeAssistantProperties.getProperty("home-assistant.url")+"/dashboard-scheduler"]
 //        Thread.sleep(2000)
-        //        println(countOccurrences(driver.pageSource, "hours"))
-        // TODO check if when scheduler-card will display toogle for all schedules is it enough to toggle that one instead going one by one
+            //        println(countOccurrences(driver.pageSource, "hours"))
+            // TODO check if when scheduler-card will display toogle for all schedules is it enough to toggle that one instead going one by one
 
 //        driver.navigate().refresh()
 //        Thread.sleep(10000)
@@ -118,47 +122,54 @@ class HomeAssistant {
 //        Thread.sleep(10000)
 
 
-        for (i in 1..5) {
-            driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
-            Thread.sleep(100)
-            val elementText = driver.switchTo().activeElement().text
-            logger.debug("tab i=$i element_txt=$elementText")
+            for (i in 1..5) {
+                driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
+                Thread.sleep(100)
+                val elementText = driver.switchTo().activeElement().text
+                logger.debug("tab i=$i element_txt=$elementText")
+                logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
+            }
             logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
-        }
-        logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
-        logger.debug("trying to open Schedules dashboard")
-        driver.findElement(By.cssSelector("body")).sendKeys(Keys.RETURN)
-        Thread.sleep(2000)
-        for (i in 1..12) {
-            driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
-            Thread.sleep(100)
-            val elementText = driver.switchTo().activeElement().text
-            logger.debug("tab i=$i element_txt=$elementText")
-            logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
-        }
+            logger.debug("trying to open Schedules dashboard")
+            driver.findElement(By.cssSelector("body")).sendKeys(Keys.RETURN)
+            Thread.sleep(2000)
+            for (i in 1..12) {
+                driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
+                Thread.sleep(100)
+                val elementText = driver.switchTo().activeElement().text
+                logger.debug("tab i=$i element_txt=$elementText")
+                logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
+            }
 
-        val numberOfSchedules: Int = homeAssistantProperties.getProperty("home-assistant.number-of-schedules").toInt()
-        logger.debug("got numberOfSchedules=$numberOfSchedules")
+            // TODO maybe add stupid screenshot check that we're
+            //      1. on schedules dashboard
+            //      2. that focus is before first schedule switch (if focused element is not visible then check just before first toggle so switch will be visibly focused
 
-        for (i in 1..numberOfSchedules) {
-            driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
-            Thread.sleep(100)
-            val elementText = driver.switchTo().activeElement().text
-            logger.debug("tab i=$i element_txt=$elementText")
-            logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
-            logger.debug("trying to turn off i=$i schedule")
-            driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
-            Thread.sleep(5000)
-            val elementText2 = driver.switchTo().activeElement().text
-            logger.debug("tab i=$i element_txt=$elementText2")
-            logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
-            logger.debug("trying to turn on i=$i schedule")
-            driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
-            Thread.sleep(100)
+
+            val numberOfSchedules: Int =
+                homeAssistantProperties.getProperty("home-assistant.number-of-schedules").toInt()
+            logger.debug("got numberOfSchedules=$numberOfSchedules")
+
+            for (i in 1..numberOfSchedules) {
+                driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
+                Thread.sleep(100)
+                val elementText = driver.switchTo().activeElement().text
+                logger.debug("tab i=$i element_txt=$elementText")
+                logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
+                logger.debug("trying to turn off i=$i schedule")
+                driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
+                Thread.sleep(5000)
+                val elementText2 = driver.switchTo().activeElement().text
+                logger.debug("tab i=$i element_txt=$elementText2")
+                logger.debug("\thtml=" + driver.switchTo().activeElement().getAttribute("innerHTML"))
+                logger.debug("trying to turn on i=$i schedule")
+                driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
+                Thread.sleep(100)
+            }
+            logger.debug("finished all schedules")
+
+            Thread.sleep(500)
         }
-        logger.debug("finished all schedules")
-
-        Thread.sleep(500)
     }
 
     fun tabUntilAttributeEquals(attributeName :String, expectedValue: String) {
@@ -179,52 +190,63 @@ class HomeAssistant {
     }
 
     fun iterateThroughSwitchesInAlwaysOnGroupAndToggleThem() {
-        val zigbe2mqttUrl = homeAssistantProperties.getProperty("zigbee2mqtt.url")+"/#/group/4"
-        logger.debug("openning url=$zigbe2mqttUrl")
-        driver[zigbe2mqttUrl]
 
-        Thread.sleep(2000)
+        if (homeAssistantProperties.getProperty("zigbee2mqtt.iterate-through-switches-in-always-on-group-and-toggle-them-enabled") == "true") {
 
-        tabUntilAttributeEquals("class", "btn btn-danger btn-sm float-right")
+            // TODO when on switch entity add url to list and then iterate through them toggling decouple mode
 
-        val numberOfSwitches: Int = countOccurrences(driver.pageSource, "LQI")
-        logger.debug("got numberOfSwitches=$numberOfSwitches")
+            val zigbe2mqttUrl = homeAssistantProperties.getProperty("zigbee2mqtt.url") + "/#/group/4"
+            logger.debug("openning url=$zigbe2mqttUrl")
+            driver[zigbe2mqttUrl]
 
-        for (i in 1..numberOfSwitches) {
+            Thread.sleep(2000)
+
+            tabUntilAttributeEquals("class", "btn btn-danger btn-sm float-right")
+
+            val numberOfSwitches: Int = countOccurrences(driver.pageSource, "LQI")
+            logger.debug("got numberOfSwitches=$numberOfSwitches")
+
+            for (i in 1..numberOfSwitches) {
 
 
-            // TODO read enpoint number and toggle only appriopriate switch
-            for (j in 1 .. 2) {
-                tabUntilAttributeEquals("class", "form-check-input")
+                // TODO read enpoint number and toggle only appriopriate switch
+                for (j in 1..2) {
+                    tabUntilAttributeEquals("class", "form-check-input")
 
-                val elementClass = driver.switchTo().activeElement().getAttribute("class")
-                logger.debug("tab i=$i elementClass=$elementClass")
+                    val elementClass = driver.switchTo().activeElement().getAttribute("class")
+                    logger.debug("tab i=$i elementClass=$elementClass")
 
-                var isSwitchEnabled:Boolean = false
-                isSwitchEnabled = try {
-                    driver.switchTo().activeElement().getAttribute("checked").equals("true")
-                } catch (e :NullPointerException) {
-                    false
-                }
+                    var isSwitchEnabled: Boolean = false
+                    isSwitchEnabled = try {
+                        driver.switchTo().activeElement().getAttribute("checked").equals("true")
+                    } catch (e: NullPointerException) {
+                        false
+                    }
 
-                var numberOfToggles = if (isSwitchEnabled) {
-                    // TODO do a force option and set it to 2 (when switch state is stucked)
-                    0
-                } else {
-                    3
-                }
-                logger.debug("switch i=$i j=$j isEnabled=$isSwitchEnabled numberOfToggles=$numberOfToggles")
+                    var numberOfToggles = if (isSwitchEnabled) {
+                        // TODO do a force option and set it to 2 (when switch state is stucked)
 
-                for (k in 1..numberOfToggles) {
-                    driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
-                    Thread.sleep(1000)
+                        if (homeAssistantProperties.getProperty("zigbee2mqtt.force-toggle-when-switch-is-already-on") == "true") {
+                            2
+                        } else {
+                            0
+                        }
+                    } else {
+                        3
+                    }
+                    logger.debug("switch i=$i j=$j isEnabled=$isSwitchEnabled numberOfToggles=$numberOfToggles")
+
+                    for (k in 1..numberOfToggles) {
+                        driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
+                        Thread.sleep(1000)
+                    }
                 }
             }
+            logger.debug("finished all switches")
+
+            Thread.sleep(2000)
+
         }
-        logger.debug("finished all switches")
-
-        Thread.sleep(2000)
-
     }
 
     fun finish() {
