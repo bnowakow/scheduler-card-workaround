@@ -12,6 +12,7 @@ class HomeAssistant {
     private var driver: WebDriver
     private val js: JavascriptExecutor
     private val homeAssistantProperties = HomeAssistantProperties()
+    private var switchDeviceUrls: MutableList<String> = ArrayList()
 
     private val logger = KotlinLogging.logger {}
 
@@ -60,7 +61,7 @@ class HomeAssistant {
 //        driver.findElement(By.cssSelector("body")).sendKeys(Keys.chord(Keys.COMMAND, "-"))
     }
 
-    fun login() {
+    private fun login() {
 
         val loggingUrl = homeAssistantProperties.getProperty("home-assistant.url")+"/lovelace"
         logger.debug("openning url=$loggingUrl")
@@ -172,7 +173,7 @@ class HomeAssistant {
         }
     }
 
-    fun tabUntilAttributeEquals(attributeName :String, expectedValue: String) {
+    private fun tabUntilAttributeEquals(attributeName :String, expectedValue: String, matchInsteadOfExact: Boolean = false) {
         var i = 0
         while (true) {
             driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
@@ -180,13 +181,29 @@ class HomeAssistant {
             val elementText = driver.switchTo().activeElement().text
             logger.debug("tab i=$i element_txt=$elementText")
             try {
-                if (driver.switchTo().activeElement().getAttribute(attributeName).equals(expectedValue)) {
-                    break
+                val value = driver.switchTo().activeElement().getAttribute(attributeName)
+                if (!matchInsteadOfExact) {
+                    // exact
+                    if (value.equals(expectedValue)) {
+                        break
+                    }
+                } else {
+                    // match
+                    if (value.contains(expectedValue)) {
+                        break
+                    }
                 }
             } catch( e: NullPointerException) {
             }
             i++
         }
+    }
+
+    private fun tabUntilNextSwitchAndCollectItsUrl() {
+        val attributeName: String = "href"
+        tabUntilAttributeEquals(attributeName, "/device/", matchInsteadOfExact = true)
+        switchDeviceUrls.add(driver.switchTo().activeElement().getAttribute(attributeName))
+        println("debug")
     }
 
     fun iterateThroughSwitchesInAlwaysOnGroupAndToggleThem() {
@@ -201,6 +218,7 @@ class HomeAssistant {
 
             Thread.sleep(2000)
 
+            tabUntilNextSwitchAndCollectItsUrl()
             tabUntilAttributeEquals("class", "btn btn-danger btn-sm float-right")
 
             val numberOfSwitches: Int = countOccurrences(driver.pageSource, "LQI")
@@ -223,7 +241,7 @@ class HomeAssistant {
                         false
                     }
 
-                    var numberOfToggles = if (isSwitchEnabled) {
+                    val numberOfToggles = if (isSwitchEnabled) {
                         // TODO do a force option and set it to 2 (when switch state is stucked)
 
                         if (homeAssistantProperties.getProperty("zigbee2mqtt.force-toggle-when-switch-is-already-on") == "true") {
@@ -241,6 +259,7 @@ class HomeAssistant {
                         Thread.sleep(1000)
                     }
                 }
+                tabUntilNextSwitchAndCollectItsUrl()
             }
             logger.debug("finished all switches")
 
