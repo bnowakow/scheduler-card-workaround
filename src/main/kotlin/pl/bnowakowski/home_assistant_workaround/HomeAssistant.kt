@@ -5,6 +5,8 @@ import org.openqa.selenium.*
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
 import org.openqa.selenium.firefox.FirefoxProfile
+import org.openqa.selenium.remote.RemoteWebElement
+import kotlin.math.log
 
 
 class HomeAssistant {
@@ -12,7 +14,8 @@ class HomeAssistant {
     private var driver: WebDriver
     private val js: JavascriptExecutor
     private val homeAssistantProperties = HomeAssistantProperties()
-    private var switchDeviceUrls: MutableList<String> = ArrayList()
+    // in iterateThroughSwitchesInAlwaysOnGroupAndToggleThem html single switch could be added twice with different endpoints (left and right button), using set so devices wouldn't be duplicated
+    private var switchDeviceUrls: MutableSet<String> = LinkedHashSet()
 
     private val logger = KotlinLogging.logger {}
 
@@ -64,7 +67,7 @@ class HomeAssistant {
     private fun login() {
 
         val loggingUrl = homeAssistantProperties.getProperty("home-assistant.url")+"/lovelace"
-        logger.debug("openning url=$loggingUrl")
+        logger.info("openning url=$loggingUrl")
         driver[loggingUrl]
         // for some reason home assistant refreshes itself, so we wait to counter that
         Thread.sleep(10000)
@@ -203,17 +206,14 @@ class HomeAssistant {
         val attributeName: String = "href"
         tabUntilAttributeEquals(attributeName, "/device/", matchInsteadOfExact = true)
         switchDeviceUrls.add(driver.switchTo().activeElement().getAttribute(attributeName))
-        println("debug")
     }
 
     fun iterateThroughSwitchesInAlwaysOnGroupAndToggleThem() {
 
         if (homeAssistantProperties.getProperty("zigbee2mqtt.iterate-through-switches-in-always-on-group-and-toggle-them-enabled") == "true") {
 
-            // TODO when on switch entity add url to list and then iterate through them toggling decouple mode
-
             val zigbe2mqttUrl = homeAssistantProperties.getProperty("zigbee2mqtt.url") + "/#/group/4"
-            logger.debug("openning url=$zigbe2mqttUrl")
+            logger.info("openning url=$zigbe2mqttUrl")
             driver[zigbe2mqttUrl]
 
             Thread.sleep(2000)
@@ -265,6 +265,66 @@ class HomeAssistant {
 
             Thread.sleep(2000)
 
+            iterateThroughSwitchesInAlwaysOnGroupAndSetDecoupleMode()
+        }
+    }
+
+    private fun tabUntilOperationModeIsFocused() {
+        tabUntilAttributeEquals("class", "btn btn-outline-secondary", matchInsteadOfExact = true)
+    }
+
+    private fun tabUntilOperationModeIsFocusedAndGoBackToRefreshButton() {
+        tabUntilOperationModeIsFocused()
+        driver.findElement(By.cssSelector("body")).sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB))
+    }
+
+    private fun iterateThroughSwitchesInAlwaysOnGroupAndSetDecoupleMode() {
+
+        for (switchDeviceAboutUrl in switchDeviceUrls) {
+            val switchDeviceExposesUrl: String = "$switchDeviceAboutUrl/exposes"
+            logger.info("openning url=$switchDeviceExposesUrl")
+            driver[switchDeviceExposesUrl]
+
+            Thread.sleep(3000)
+
+            tabUntilAttributeEquals("aria-label", "Select a device")
+
+            // TODO in iterateThroughSwitchesInAlwaysOnGroupAndToggleThem html single switch could be added twice with different endpoints (left and right button), if we turn on given endpoint then in here we set decoupled to all endpoints instead of selected one, check it
+            for (i in 1..2) {
+                tabUntilOperationModeIsFocusedAndGoBackToRefreshButton()
+
+                // check if previous sibling has label for Decoupled mode
+                var previousSibling: WebElement = RemoteWebElement()
+                try {
+                    previousSibling =
+                        driver.switchTo().activeElement().findElement(By.xpath("preceding-sibling::strong[1]"))
+                } catch(e: NoSuchElementException) {
+                }
+                if (previousSibling.getAttribute("title").contains("Decoupled mode for")) {
+                    // click refresh
+                    logger.info("clicking refresh button for operation mode")
+                    driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
+                    Thread.sleep(4000)
+                    // decouple operation mode is second after control_relay
+                    for (j in 1..2) {
+                        tabUntilOperationModeIsFocused()
+                    }
+
+                    if (driver.switchTo().activeElement().text.equals("decoupled")) {
+                        logger.info("clicking decoupled")
+                        // TODO for some reason in Arc html returns coupled mode for same device that in this Firefox returns decoupled :/
+                        driver.findElement(By.cssSelector("body")).sendKeys(Keys.SPACE)
+                    } else {
+                        logger.error("active element wasn't decoupled operation mode")
+                    }
+                } else {
+                    logger.error("active element wasn't refresh button for operation mode")
+                }
+
+                Thread.sleep(2000)
+            }
+
+            println("debug")
         }
     }
 
