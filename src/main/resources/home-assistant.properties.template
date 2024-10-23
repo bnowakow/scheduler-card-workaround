@@ -9,3 +9,6 @@ zigbee2mqtt.force-toggle-when-switch-is-already-on=false
 zigbee2mqtt.url=
 
 browser.headless=true
+
+#browser.application=chrome
+browser.application=firefox

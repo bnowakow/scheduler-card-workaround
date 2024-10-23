@@ -178,4 +178,5 @@ gradle-app.setting
 ### App-specyfic ones
 **/.DS_Store
 src/main/resources/home-assistant.properties
-
+src/main/resources/home-assistant.properties.firefox
+src/main/resources/home-assistant.properties.chrome

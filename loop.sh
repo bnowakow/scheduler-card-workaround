@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 git pull
 
@@ -9,12 +9,21 @@ git pull
 # https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/
 # docker buildx create --use
 #docker buildx build --push --platform linux/amd64 --tag bnowakow/scheduler-card-thermostat-workaround:latest .
-docker buildx build --platform linux/amd64 --tag bnowakow/scheduler-card-thermostat-workaround:latest .
+
 
 while true; do
+
+  for browser in chrome firefox ; do
+
+    echo browser=$browser
+    cp Dockerfile.$browser Dockerfile
+    cp src/main/resources/home-assistant.properties.$browser src/main/resources/home-assistant.properties
+    # TODO do separate image for chrome and firefox and run them to save time to not build on each iteration
+    docker buildx build --platform linux/amd64 --tag bnowakow/scheduler-card-thermostat-workaround:latest .
     timeout 600 docker compose up
     docker compose down
     date
     sleep 30m
+  done
 done
 

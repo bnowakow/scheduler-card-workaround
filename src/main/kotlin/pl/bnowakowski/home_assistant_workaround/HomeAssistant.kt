@@ -4,7 +4,12 @@ import mu.KotlinLogging
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxOptions
+import org.openqa.selenium.firefox.FirefoxProfile
+import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.remote.RemoteWebElement
+import org.openqa.selenium.safari.SafariDriver
 
 
 class HomeAssistant {
@@ -19,47 +24,62 @@ class HomeAssistant {
 
 
     init {
-//         Chrome
-          // https://www.browserstack.com/guide/selenium-headless-browser-testing
-        val options = ChromeOptions()
-        if (homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
-            logger.debug("running browser in headless mode")
-            options.addArguments("--no-sandbox")
-            options.addArguments("--headless=new")
-            options.addArguments("--disable-gpu")
-            options.addArguments("--disable-dev-shm-usage")
-        }
-        driver = ChromeDriver(options)
+        if ((homeAssistantProperties.getProperty("browser.application") != "firefox")
+            && (homeAssistantProperties.getProperty("browser.application") != "chrome")) {
+                throw RuntimeException("only firefox or chrome browser.application is supported")
+            }
 
-        // Safari
+        // TODO fix to initialize as null
+        driver = ChromeDriver()
+
+        //         Safari
 //        driver = SafariDriver()
 
-//        // Firefox
-//        // https://www.browserstack.com/docs/automate/selenium/firefox-profile
-//        val firefoxProfile = FirefoxProfile()
-//
-//        // https://stackoverflow.com/questions/15397483/how-do-i-set-browser-width-and-height-in-selenium-webdriver
-//        val firefoxOptions = FirefoxOptions()
-//
-//        // https://github.com/mdn/headless-examples/blob/master/headlessfirefox-gradle/src/main/java/com/mozilla/example/HeadlessFirefoxSeleniumExample.java
-//        if (homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
-//            logger.debug("running browser in headless mode")
-//            firefoxOptions.addArguments("--headless")
-//        } else {
-//            logger.debug("running browser in non-headless mode")
-//            // https://stackoverflow.com/questions/15397483/how-do-i-set-browser-width-and-height-in-selenium-webdriver
-//            firefoxOptions.addArguments("--width=1000")
-//            firefoxOptions.addArguments("--height=3440")
-//        }
-//        firefoxOptions.profile = firefoxProfile
-//
-//        driver = FirefoxDriver(firefoxOptions)
-        if (!homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
-            // laptop screen
-//        driver.manage().window().position = Point(800, 0)
-            // desktop screen
-            driver.manage().window().position = Point(1490, 0)
+//         Chrome
+          // https://www.browserstack.com/guide/selenium-headless-browser-testing
+        if (homeAssistantProperties.getProperty("browser.application") == "chrome") {
+            val options = ChromeOptions()
+            if (homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
+                logger.debug("running browser in headless mode")
+                options.addArguments("--no-sandbox")
+                options.addArguments("--headless=new")
+                options.addArguments("--disable-gpu")
+                options.addArguments("--disable-dev-shm-usage")
+            }
+            driver = ChromeDriver(options)
         }
+
+
+
+        if (homeAssistantProperties.getProperty("browser.application") == "firefox") {
+            // Firefox
+            // https://www.browserstack.com/docs/automate/selenium/firefox-profile
+            val firefoxProfile = FirefoxProfile()
+
+            // https://stackoverflow.com/questions/15397483/how-do-i-set-browser-width-and-height-in-selenium-webdriver
+            val firefoxOptions = FirefoxOptions()
+
+            // https://github.com/mdn/headless-examples/blob/master/headlessfirefox-gradle/src/main/java/com/mozilla/example/HeadlessFirefoxSeleniumExample.java
+            if (homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
+                logger.debug("running browser in headless mode")
+                firefoxOptions.addArguments("--headless")
+            } else {
+                logger.debug("running browser in non-headless mode")
+                // https://stackoverflow.com/questions/15397483/how-do-i-set-browser-width-and-height-in-selenium-webdriver
+                firefoxOptions.addArguments("--width=1000")
+                firefoxOptions.addArguments("--height=3440")
+            }
+            firefoxOptions.profile = firefoxProfile
+
+            driver = FirefoxDriver(firefoxOptions)
+            if (!homeAssistantProperties.getProperty("browser.headless").toBoolean()) {
+                // laptop screen
+                //        driver.manage().window().position = Point(800, 0)
+                // desktop screen
+                driver.manage().window().position = Point(1490, 0)
+            }
+        }
+
 
 
         driver
