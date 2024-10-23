@@ -23,7 +23,8 @@ while true; do
     timeout 600 docker compose up
     docker compose down
     date
-    sleep 30m
+    rm Dockerfile src/main/resources/home-assistant.properties
   done
+  sleep 30m
 done
 
