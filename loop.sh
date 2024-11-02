@@ -10,6 +10,8 @@ git pull
 # docker buildx create --use
 #docker buildx build --push --platform linux/amd64 --tag bnowakow/scheduler-card-thermostat-workaround:latest .
 
+# TODO read from optional cli argument $1
+intelij_manual_execution=true
 
 while true; do
 
@@ -19,15 +21,19 @@ while true; do
     echo browser=$browser
     cp Dockerfile.$browser Dockerfile
     cp src/main/resources/home-assistant.properties.$browser src/main/resources/home-assistant.properties
-#    exit
-    # TODO do separate image for chrome and firefox and run them to save time to not build on each iteration
-    docker buildx build --platform linux/amd64 --tag bnowakow/scheduler-card-thermostat-workaround:latest .
-#    timeout 600 docker compose up
-    docker compose up
-    docker compose down
+
+    if [ "$intelij_manual_execution" == "true" ]; then
+      ./gradlew --console verbose --full-stacktrace shadowJar
+      java -jar build/libs/shadow-1.0-SNAPSHOT-all.jar
+    else
+      # TODO do separate image for chrome and firefox and run them to save time to not build on each iteration
+      docker buildx build --platform linux/amd64 --tag bnowakow/scheduler-card-thermostat-workaround:latest .
+#      timeout 600 docker compose up
+      docker compose up
+      docker compose down
+    fi
     date
     rm Dockerfile src/main/resources/home-assistant.properties
-    exit
   done
   sleep 30m
 done
