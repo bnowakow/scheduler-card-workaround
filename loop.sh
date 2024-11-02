@@ -13,17 +13,21 @@ git pull
 
 while true; do
 
-  for browser in chrome firefox ; do
+  for browser in chrome firefox; do
+#  for browser in firefox chrome; do
 
     echo browser=$browser
     cp Dockerfile.$browser Dockerfile
     cp src/main/resources/home-assistant.properties.$browser src/main/resources/home-assistant.properties
+#    exit
     # TODO do separate image for chrome and firefox and run them to save time to not build on each iteration
     docker buildx build --platform linux/amd64 --tag bnowakow/scheduler-card-thermostat-workaround:latest .
-    timeout 600 docker compose up
+#    timeout 600 docker compose up
+    docker compose up
     docker compose down
     date
     rm Dockerfile src/main/resources/home-assistant.properties
+    exit
   done
   sleep 30m
 done

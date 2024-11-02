@@ -30,7 +30,7 @@ class HomeAssistant {
             }
 
         // TODO fix to initialize as null
-        driver = ChromeDriver()
+//        driver = null
 
         //         Safari
 //        driver = SafariDriver()
@@ -47,11 +47,8 @@ class HomeAssistant {
                 options.addArguments("--disable-dev-shm-usage")
             }
             driver = ChromeDriver(options)
-        }
-
-
-
-        if (homeAssistantProperties.getProperty("browser.application") == "firefox") {
+        } else {
+//        if (homeAssistantProperties.getProperty("browser.application") == "firefox") {
             // Firefox
             // https://www.browserstack.com/docs/automate/selenium/firefox-profile
             val firefoxProfile = FirefoxProfile()
@@ -79,7 +76,6 @@ class HomeAssistant {
                 driver.manage().window().position = Point(1490, 0)
             }
         }
-
 
 
         driver
