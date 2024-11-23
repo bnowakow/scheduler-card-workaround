@@ -16,11 +16,11 @@ repositories {
 dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("ch.qos.logback:logback-classic:1.4.7")
-    implementation("org.seleniumhq.selenium:selenium-chrome-driver:4.16.1")
-    implementation("org.seleniumhq.selenium:selenium-firefox-driver:4.16.1")
-    implementation("org.seleniumhq.selenium:selenium-safari-driver:4.16.1")
-    implementation("org.seleniumhq.selenium:selenium-java:4.16.1")
-    implementation("org.seleniumhq.selenium:selenium-support:4.16.1")
+    implementation("org.seleniumhq.selenium:selenium-chrome-driver:4.26.0")
+    implementation("org.seleniumhq.selenium:selenium-firefox-driver:4.26.0")
+    implementation("org.seleniumhq.selenium:selenium-safari-driver:4.26.0")
+    implementation("org.seleniumhq.selenium:selenium-java:4.26.0")
+    implementation("org.seleniumhq.selenium:selenium-support:4.26.0")
     testImplementation(kotlin("test"))
 }
 

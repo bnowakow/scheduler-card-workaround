@@ -145,7 +145,7 @@ class HomeAssistant {
 //        Thread.sleep(10000)
 
 
-            for (i in 1..5) {
+            for (i in 1..4) {
                 driver.findElement(By.cssSelector("body")).sendKeys(Keys.TAB)
                 Thread.sleep(100)
                 val elementText = driver.switchTo().activeElement().text

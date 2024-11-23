@@ -2,6 +2,8 @@
 
 git pull
 
+# TODO for linux check if firefox is installed via snap, if it is remove it and install it from mozzilla ppa https://askubuntu.com/a/1403204
+
 # for error "network bridge not found" do sudo ~/code/bash_configs/nas/change-iptables-bridge-docker-settings.sh
 # TODO check if build was successfull
 # docker compose build
@@ -15,8 +17,8 @@ intelij_manual_execution=true
 
 while true; do
 
-  for browser in chrome firefox; do
-#  for browser in firefox chrome; do
+#  for browser in chrome firefox; do
+  for browser in firefox chrome; do
 
     echo browser=$browser
     cp Dockerfile.$browser Dockerfile
@@ -24,7 +26,8 @@ while true; do
 
     if [ "$intelij_manual_execution" == "true" ]; then
       ./gradlew --console verbose --full-stacktrace shadowJar
-      java -jar build/libs/shadow-1.0-SNAPSHOT-all.jar
+      # TODO do a function that does timelimit or timeout or none if the binary is present
+        timelimit -t 600 java -jar build/libs/shadow-1.0-SNAPSHOT-all.jar
     else
       # TODO do separate image for chrome and firefox and run them to save time to not build on each iteration
       docker buildx build --platform linux/amd64 --tag bnowakow/scheduler-card-thermostat-workaround:latest .
