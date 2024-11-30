@@ -18,7 +18,7 @@ intelij_manual_execution=true
 while true; do
 
 #  for browser in chrome firefox; do
-  for browser in firefox chrome; do
+  for browser in chrome; do
 
     echo browser=$browser
     cp Dockerfile.$browser Dockerfile

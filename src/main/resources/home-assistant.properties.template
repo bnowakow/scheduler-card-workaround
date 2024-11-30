@@ -2,6 +2,12 @@ home-assistant.url=
 home-assistant.username=
 home-assistant.password=
 home-assistant.toggle-schedules-enabled=true
+
+home-assistant.toggle-schedules-enabled-strategy=api
+#home-assistant.toggle-schedules-enabled-strategy=selenium
+
+home-assistant.token=
+
 home-assistant.number-of-schedules=1
 
 zigbee2mqtt.iterate-through-switches-in-always-on-group-and-toggle-them-enabled=true
@@ -10,5 +16,5 @@ zigbee2mqtt.url=
 
 browser.headless=true
 
-#browser.application=chrome
-browser.application=firefox
+browser.application=chrome
+#browser.application=firefox

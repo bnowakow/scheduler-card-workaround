@@ -7,10 +7,24 @@ import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
 import org.openqa.selenium.firefox.FirefoxProfile
-import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.remote.RemoteWebElement
-import org.openqa.selenium.safari.SafariDriver
+import io.ktor.client.request.*
+import io.ktor.client.*
+import io.ktor.client.call.body
+import io.ktor.client.engine.cio.*
+import kotlinx.coroutines.runBlocking
+import io.ktor.client.plugins.auth.*
+import io.ktor.client.plugins.auth.providers.BearerTokens
+import io.ktor.client.plugins.auth.providers.bearer
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
+@Serializable
+data class EntityState(val entity_id: String?, val state: String)
 
 class HomeAssistant {
 
@@ -22,6 +36,24 @@ class HomeAssistant {
 
     private val logger = KotlinLogging.logger {}
 
+    private val client = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+        install(Auth) {
+            bearer {
+                loadTokens {
+                    // Load tokens from a local storage and return them as the 'BearerTokens' instance
+                    BearerTokens(
+                        homeAssistantProperties.getProperty("home-assistant.token"),
+                        homeAssistantProperties.getProperty("home-assistant.token")
+                    )
+                }
+            }
+        }
+    }
 
     init {
         if ((homeAssistantProperties.getProperty("browser.application") != "firefox")
@@ -127,9 +159,10 @@ class HomeAssistant {
         return count
     }
 
-    fun iterateThroughSchedulesAndToggleThem() {
+    fun iterateThroughSchedulesAndToggleThemUsingSelenium() {
 
-        if (homeAssistantProperties.getProperty("home-assistant.toggle-schedules-enabled") == "true") {
+        if ((homeAssistantProperties.getProperty("home-assistant.toggle-schedules-enabled") == "true") &&
+            (homeAssistantProperties.getProperty("home-assistant.toggle-schedules-enabled-strategy") == "selenium")) {
 
             login()
 
@@ -193,6 +226,47 @@ class HomeAssistant {
 
             Thread.sleep(500)
         }
+    }
+
+    fun changeEntityState(entity: EntityState) {
+        runBlocking {
+
+            logger.info("trying to set ${entity.entity_id} to ${entity.state}")
+            client.post(homeAssistantProperties.getProperty("home-assistant.url") + "/api/states/${entity.entity_id}") {
+                contentType(ContentType.Application.Json)
+                setBody(entity)
+            }
+            Thread.sleep(1000)
+        }
+    }
+
+
+    fun iterateThroughSchedulesAndToggleThemUsingApi() {
+        if ((homeAssistantProperties.getProperty("home-assistant.toggle-schedules-enabled") == "true") &&
+            (homeAssistantProperties.getProperty("home-assistant.toggle-schedules-enabled-strategy") == "api")) {
+
+            runBlocking {
+
+                var schedulerEntitiesChanged = 0
+                val entities: List<EntityState> = client.get(homeAssistantProperties.getProperty("home-assistant.url") + "/api/states").body()
+                logger.info("got {${entities.count()}} of all entities")
+                for (entity: EntityState in entities) {
+                    entity.entity_id?.let {
+                        if (it.startsWith("switch.schedule_")) {
+                            if (entity.state.equals("on")) {
+                                changeEntityState(EntityState(entity_id = entity.entity_id, state = "off"))
+                            }
+                            changeEntityState(EntityState(entity_id = entity.entity_id, state = "on"))
+                            schedulerEntitiesChanged++
+                        }
+                    }
+                }
+                logger.info("tried to change {${schedulerEntitiesChanged}} scheduler entities")
+            }
+            client.close()
+
+        }
+
     }
 
     private fun tabUntilAttributeEquals(attributeName :String, expectedValue: String, matchInsteadOfExact: Boolean = false) {

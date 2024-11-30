@@ -7,7 +7,8 @@ fun main() {
 
     val homeAssistant = HomeAssistant()
 
-    homeAssistant.iterateThroughSchedulesAndToggleThem()
+    homeAssistant.iterateThroughSchedulesAndToggleThemUsingSelenium()
+    homeAssistant.iterateThroughSchedulesAndToggleThemUsingApi()
     homeAssistant.iterateThroughSwitchesInAlwaysOnGroupAndToggleThem()
 
     // run always
