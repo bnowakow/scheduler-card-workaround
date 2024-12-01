@@ -24,10 +24,11 @@ while true; do
     cp Dockerfile.$browser Dockerfile
     cp src/main/resources/home-assistant.properties.$browser src/main/resources/home-assistant.properties
 
+    date
     if [ "$intelij_manual_execution" == "true" ]; then
       ./gradlew --console verbose --full-stacktrace shadowJar
       # TODO do a function that does timelimit or timeout or none if the binary is present
-        timelimit -t 600 java -jar build/libs/shadow-1.0-SNAPSHOT-all.jar
+        timelimit -t 1200 java -jar build/libs/shadow-1.0-SNAPSHOT-all.jar
     else
       # TODO do separate image for chrome and firefox and run them to save time to not build on each iteration
       docker buildx build --platform linux/amd64 --tag bnowakow/scheduler-card-thermostat-workaround:latest .
