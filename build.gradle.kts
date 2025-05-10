@@ -1,4 +1,5 @@
 val ktor_version: String = "2.3.13"
+val selenium_version: String = "4.32.0"
 
 // https://kotlinlang.org/docs/get-started-with-jvm-gradle-project.html#explore-the-build-script
 
@@ -19,19 +20,19 @@ repositories {
 dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("ch.qos.logback:logback-classic:1.4.12")
-    implementation("org.seleniumhq.selenium:selenium-chrome-driver:4.26.0")
-    implementation("org.seleniumhq.selenium:selenium-firefox-driver:4.26.0")
-    implementation("org.seleniumhq.selenium:selenium-safari-driver:4.26.0")
-    implementation("org.seleniumhq.selenium:selenium-java:4.26.0")
-    implementation("org.seleniumhq.selenium:selenium-support:4.26.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.seleniumhq.selenium:selenium-chrome-driver:$selenium_version")
+    implementation("org.seleniumhq.selenium:selenium-firefox-driver:$selenium_version")
+    implementation("org.seleniumhq.selenium:selenium-safari-driver:$selenium_version")
+    implementation("org.seleniumhq.selenium:selenium-java:$selenium_version")
+    implementation("org.seleniumhq.selenium:selenium-support:$selenium_version")
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-logging:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("io.ktor:ktor-client-auth:$ktor_version")
-    testImplementation(kotlin("test"))
+testImplementation(kotlin("test"))
 }
 
 tasks.test {
