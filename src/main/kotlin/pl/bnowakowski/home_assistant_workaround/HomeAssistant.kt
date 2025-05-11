@@ -236,7 +236,7 @@ class HomeAssistant {
                 contentType(ContentType.Application.Json)
                 setBody(entity)
             }
-            Thread.sleep(1000)
+            Thread.sleep(10000)
         }
     }
 
@@ -285,7 +285,7 @@ class HomeAssistant {
                     }
                 } else {
                     // match
-                    if (value.contains(expectedValue)) {
+                    if (value?.contains(expectedValue)!!) {
                         break
                     }
                 }
@@ -298,7 +298,7 @@ class HomeAssistant {
     private fun tabUntilNextSwitchAndCollectItsUrl() {
         val attributeName: String = "href"
         tabUntilAttributeEquals(attributeName, "/device/", matchInsteadOfExact = true)
-        switchDeviceUrls.add(driver.switchTo().activeElement().getAttribute(attributeName))
+        switchDeviceUrls.add(driver.switchTo().activeElement().getAttribute(attributeName)!!)
     }
 
     fun iterateThroughSwitchesInAlwaysOnGroupAndToggleThem() {
@@ -316,7 +316,7 @@ class HomeAssistant {
             tabUntilNextSwitchAndCollectItsUrl()
             tabUntilAttributeEquals("class", "btn btn-danger btn-sm float-right")
 
-            val numberOfSwitches: Int = countOccurrences(driver.pageSource, "LQI")
+            val numberOfSwitches: Int = countOccurrences(driver.pageSource!!, "LQI")
             logger.debug("got numberOfSwitches=$numberOfSwitches")
 
             for (i in 1..numberOfSwitches) {
@@ -397,7 +397,7 @@ class HomeAssistant {
                         driver.switchTo().activeElement().findElement(By.xpath("preceding-sibling::strong[1]"))
                 } catch(e: NoSuchElementException) {
                 }
-                if (previousSibling.getAttribute("title").contains("Decoupled mode for")) {
+                if (previousSibling.getAttribute("title")?.contains("Decoupled mode for")!!) {
                     // click refresh
                     logger.debug("\tclicking refresh button for operation mode")
                     driver.switchTo().activeElement().sendKeys(Keys.SPACE)
@@ -408,7 +408,7 @@ class HomeAssistant {
                     }
 
                     if (driver.switchTo().activeElement().text.equals("decoupled")) {
-                        if (driver.switchTo().activeElement().getAttribute("class").contains("active")) {
+                        if (driver.switchTo().activeElement().getAttribute("class")?.contains("active")!!) {
                             logger.info("\tendpoint i=$i marked already as decoupled")
                         } else {
                             logger.info("\tendpoint i=$i marked as control_relay")

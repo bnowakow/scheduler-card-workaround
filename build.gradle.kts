@@ -4,9 +4,9 @@ val selenium_version: String = "4.32.0"
 // https://kotlinlang.org/docs/get-started-with-jvm-gradle-project.html#explore-the-build-script
 
 plugins {
-    kotlin("jvm") version "2.0.0-RC1"
+    kotlin("jvm") version "2.1.20"
     application
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "8.3.6"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.20"
 }
 
@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
-    implementation("ch.qos.logback:logback-classic:1.4.12")
+    implementation("ch.qos.logback:logback-classic:1.5.13")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("org.seleniumhq.selenium:selenium-chrome-driver:$selenium_version")
     implementation("org.seleniumhq.selenium:selenium-firefox-driver:$selenium_version")
@@ -40,7 +40,7 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 application {
